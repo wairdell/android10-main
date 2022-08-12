@@ -105,8 +105,10 @@ public final class ArrayMap<K, V> implements Map<K, V> {
     static int mTwiceBaseCacheSize;
 
     final boolean mIdentityHashCode;
+    /** 保存了key对应hashCode的数组 */
     @UnsupportedAppUsage(maxTargetSdk = 28) // Hashes are an implementation detail. Use public key/value API.
     int[] mHashes;
+    /** 保存了key和value的数组，value在key位置的后一个，key在这里的位置和key.hashCode在mHashes的位置对应(hashCode的index/2就是key的位置，除以二是因为mArray存了key+value)，*/
     @UnsupportedAppUsage(maxTargetSdk = 28) // Storage is an implementation detail. Use public key/value API.
     Object[] mArray;
     @UnsupportedAppUsage(maxTargetSdk = 28) // Use size()
@@ -146,6 +148,7 @@ public final class ArrayMap<K, V> implements Map<K, V> {
             return index;
         }
 
+        //mHashes 可能会存在 hashCode 一样的数据，所以还要查找前后hashCode 一样的数据
         // Search for a matching key after the index.
         int end;
         for (end = index + 1; end < N && mHashes[end] == hash; end++) {
@@ -208,6 +211,7 @@ public final class ArrayMap<K, V> implements Map<K, V> {
         if (mHashes == EMPTY_IMMUTABLE_INTS) {
             throw new UnsupportedOperationException("ArrayMap is immutable");
         }
+        //扩容为4或8时，直接使用对象池里的对象
         if (size == (BASE_SIZE*2)) {
             synchronized (ArrayMap.class) {
                 if (mTwiceBaseCache != null) {
@@ -244,6 +248,7 @@ public final class ArrayMap<K, V> implements Map<K, V> {
 
     @UnsupportedAppUsage(maxTargetSdk = 28) // Allocations are an implementation detail.
     private static void freeArrays(final int[] hashes, final Object[] array, final int size) {
+        //对象池，将数组容量为4或8的保存起来，用于其他的ArrayMap扩容为4或8的数组，避免扩容而发生内存抖动，array[1]引用当前hash表，array[0]引用之前的cache对象形成链表的数据结构
         if (hashes.length == (BASE_SIZE*2)) {
             synchronized (ArrayMap.class) {
                 if (mTwiceBaseCacheSize < CACHE_SIZE) {
@@ -573,6 +578,7 @@ public final class ArrayMap<K, V> implements Map<K, V> {
         if (index < osize) {
             if (DEBUG) Log.d(TAG, "put: move " + index + "-" + (osize-index)
                     + " to " + (index+1));
+            //插入。需要把插入的位置空起来，把之前以及后面的元素往后挪
             System.arraycopy(mHashes, index, mHashes, index + 1, osize - index);
             System.arraycopy(mArray, index << 1, mArray, (index + 1) << 1, (mSize - index) << 1);
         }

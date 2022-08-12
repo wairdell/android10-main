@@ -19,6 +19,7 @@ package android.util;
 class ContainerHelpers {
 
     // This is Arrays.binarySearch(), but doesn't do any argument validation.
+    /** 二分查找 */
     static int binarySearch(int[] array, int size, int value) {
         int lo = 0;
         int hi = size - 1;
