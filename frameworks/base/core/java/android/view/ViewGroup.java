@@ -2596,6 +2596,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                 // Throw away all previous state when starting a new touch gesture.
                 // The framework may have dropped the up or cancel event for the previous gesture
                 // due to an app switch, ANR, or some other state change.
+                // 清除 mFirstTouchTarget 和 FLAG_DISALLOW_INTERCEPT
                 cancelAndClearTouchTargets(ev);
                 resetTouchState();
             }
@@ -2606,6 +2607,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     || mFirstTouchTarget != null) {
                 final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
                 if (!disallowIntercept) {
+                    //如果不允许拦截，则调用 onInterceptTouchEvent 判断是否需要拦截(注意 ACTION_DOWN 时 disallowIntercept 一定为 false)
                     intercepted = onInterceptTouchEvent(ev);
                     ev.setAction(action); // restore action in case it was changed
                 } else {
@@ -2614,6 +2616,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             } else {
                 // There are no touch targets and this action is not an initial down
                 // so this view group continues to intercept touches.
+                // 如果之前的事件子 View 没有消耗过，则直接拦截(也就代表着如果 Down 事件没有任何 子View 处理，那么接下来的都由自己尝试处理)
                 intercepted = true;
             }
 
@@ -2641,6 +2644,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                 View childWithAccessibilityFocus = ev.isTargetAccessibilityFocus()
                         ? findChildWithAccessibilityFocus() : null;
 
+                //可以看成只有 Down 事件才会走下面流程 ?
                 if (actionMasked == MotionEvent.ACTION_DOWN
                         || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
                         || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
@@ -2679,7 +2683,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                                 childWithAccessibilityFocus = null;
                                 i = childrenCount - 1;
                             }
-
+                            //2.判断事件坐标
                             if (!child.canReceivePointerEvents()
                                     || !isTransformedTouchPointInView(x, y, child, null)) {
                                 ev.setTargetAccessibilityFocus(false);
@@ -2688,6 +2692,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
 
                             newTouchTarget = getTouchTarget(child);
                             if (newTouchTarget != null) {
+                                //子 View 之前已经消费过，跳出循环
                                 // Child is already receiving touch within its bounds.
                                 // Give it the new pointer in addition to the ones it is handling.
                                 newTouchTarget.pointerIdBits |= idBitsToAssign;
@@ -2695,6 +2700,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                             }
 
                             resetCancelNextUpFlag(child);
+                            //事件传递给子view
                             if (dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)) {
                                 // Child wants to receive touch within its bounds.
                                 mLastTouchDownTime = ev.getDownTime();
@@ -2711,8 +2717,10 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                                 }
                                 mLastTouchDownX = ev.getX();
                                 mLastTouchDownY = ev.getY();
+                                //如果子View消耗了则给mFirstTouchTarget赋值
                                 newTouchTarget = addTouchTarget(child, idBitsToAssign);
                                 alreadyDispatchedToNewTouchTarget = true;
+                                //子 View 消耗了则跳出循环
                                 break;
                             }
 
@@ -2722,7 +2730,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                         }
                         if (preorderedList != null) preorderedList.clear();
                     }
-
+                    //没有任何子 View 消费了事件，将 mFirstTouchTarget 的链表最后的 touchTarget 赋给 newTouchTarge
                     if (newTouchTarget == null && mFirstTouchTarget != null) {
                         // Did not find a child to receive the event.
                         // Assign the pointer to the least recently added target.
@@ -2737,6 +2745,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
 
             // Dispatch to touch targets.
             if (mFirstTouchTarget == null) {
+                //如果没有任何子 View 消费了事件，则调用 super.dispatchTouchEvent
                 // No touch targets so treat this as an ordinary view.
                 handled = dispatchTransformedTouchEvent(ev, canceled, null,
                         TouchTarget.ALL_POINTER_IDS);
@@ -2748,6 +2757,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                 while (target != null) {
                     final TouchTarget next = target.next;
                     if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
+                        //这里 alreadyDispatchedToNewTouchTarget 为 true 时，代表 Down 事件被消费过，不用在分发了，直接标记为已消费
                         handled = true;
                     } else {
                         final boolean cancelChild = resetCancelNextUpFlag(target.child)
@@ -2773,6 +2783,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             }
 
             // Update list of touch targets for pointer up or cancel, if needed.
+            //当发生抬起或取消事件，更新触摸targets
             if (canceled
                     || actionMasked == MotionEvent.ACTION_UP
                     || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
@@ -3051,14 +3062,15 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         if (newPointerIdBits == oldPointerIdBits) {
             if (child == null || child.hasIdentityMatrix()) {
                 if (child == null) {
+                    //不存在子视图时，ViewGroup调用View.dispatchTouchEvent分发事件
                     handled = super.dispatchTouchEvent(event);
                 } else {
                     final float offsetX = mScrollX - child.mLeft;
                     final float offsetY = mScrollY - child.mTop;
                     event.offsetLocation(offsetX, offsetY);
-
+                    //将触摸事件分发给子ViewGroup或View
                     handled = child.dispatchTouchEvent(event);
-
+                    //调整该事件的位置
                     event.offsetLocation(-offsetX, -offsetY);
                 }
                 return handled;
@@ -4317,6 +4329,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
     }
 
     /**
+     * 获取一个视图组的先序列表，通过虚拟的Z轴来排序。
      * Populates (and returns) mPreSortedChildren with a pre-ordered list of the View's children,
      * sorted first by Z, then by child drawing order (if applicable). This list must be cleared
      * after use to avoid leaking child Views.

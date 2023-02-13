@@ -55,6 +55,7 @@ import libcore.util.EmptyArray;
  */
 public class SparseArray<E> implements Cloneable {
     private static final Object DELETED = new Object();
+    /** 有元素删除时，不会立马整理数组，而是把 mValues 对应位置的元素设为 DELETED,并且把 mGarbage 设为 true，等待其他方法调用 gc 方法进行整理 */
     private boolean mGarbage = false;
 
     @UnsupportedAppUsage(maxTargetSdk = 28) // Use keyAt(int)
@@ -201,6 +202,11 @@ public class SparseArray<E> implements Cloneable {
         }
     }
 
+    /**
+     *  mGarbage 为 true 分为两大类情况调用此方法
+     * 第一类：调用跟 index 或 size 的方法会调用此方法进行整理
+     * 第二类：插入元素前如果已使用容量大于等于存储数据的大小也会调用此方法(大于的情况应该不存在)
+     */
     private void gc() {
         // Log.e("SparseArray", "gc start with " + mSize);
 
@@ -243,6 +249,7 @@ public class SparseArray<E> implements Cloneable {
             i = ~i;
 
             if (i < mSize && mValues[i] == DELETED) {
+                //进入这里虽然没找到，但是需要的位置的元素为 DELETED 直接覆盖之前的值
                 mKeys[i] = key;
                 mValues[i] = value;
                 return;
@@ -444,7 +451,7 @@ public class SparseArray<E> implements Cloneable {
             put(key, value);
             return;
         }
-
+        //走到这是要添加的key大小当前最后一个元素的key，不用进行二分查找，直接插入到尾部
         if (mGarbage && mSize >= mKeys.length) {
             gc();
         }

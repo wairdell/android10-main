@@ -4781,9 +4781,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * have {@link android.R.attr#state_focused} defined in its background.
      */
     boolean mDefaultFocusHighlightEnabled = true;
-
+    /** 触发长按事件的 Runnable */
     private CheckForLongPress mPendingCheckForLongPress;
     @UnsupportedAppUsage
+    /** View 在可滑动控件中，延迟触发点击相关代码的 Runnable */
     private CheckForTap mPendingCheckForTap = null;
     private PerformClick mPerformClick;
     private SendViewScrolledAccessibilityEvent mSendViewScrolledAccessibilityEvent;
@@ -13916,6 +13917,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @return True if the event was handled by the view, false otherwise.
      */
     public boolean dispatchTouchEvent(MotionEvent event) {
+        //如果事件应该首先由可访问性焦点处理。
         // If the event should be handled by accessibility focus first.
         if (event.isTargetAccessibilityFocus()) {
             // We don't have focus or no virtual descendant has it, do not handle the event.
@@ -13935,6 +13937,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         final int actionMasked = event.getActionMasked();
         if (actionMasked == MotionEvent.ACTION_DOWN) {
             // Defensive cleanup for new gesture
+            //在Down事件之前，如果存在滚动操作则停止。不存在则不进行操作
             stopNestedScroll();
         }
 
@@ -13947,9 +13950,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (li != null && li.mOnTouchListener != null
                     && (mViewFlags & ENABLED_MASK) == ENABLED
                     && li.mOnTouchListener.onTouch(this, event)) {
+                //先触发 OnTouchListener.onTouch 方法
                 result = true;
             }
 
+            //上面没有消费过，则调用 onTouchEvent 进行消费
             if (!result && onTouchEvent(event)) {
                 result = true;
             }
@@ -15302,6 +15307,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 setPressed(false);
             }
             mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
+            //如果按钮是禁用状态，不做任何事情，直接返回。是否消费事件由 clickable  确定
             // A disabled view that is clickable still consumes the touch
             // events, it just doesn't respond to them.
             return clickable;
@@ -15311,15 +15317,17 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 return true;
             }
         }
-
+        //TOOLTIP 是 android10 加入的，长按 View 可以显示提示(android:tooltipText)
         if (clickable || (viewFlags & TOOLTIP) == TOOLTIP) {
             switch (action) {
                 case MotionEvent.ACTION_UP:
                     mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
                     if ((viewFlags & TOOLTIP) == TOOLTIP) {
+                        //延迟隐藏 TOOLTIP
                         handleTooltipUp();
                     }
                     if (!clickable) {
+                        //不能点击直接移除之前设置的延迟触发逻辑
                         removeTapCallback();
                         removeLongPressCallback();
                         mInContextButtonPress = false;
@@ -15332,11 +15340,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         // take focus if we don't have it already and we should in
                         // touch mode.
                         boolean focusTaken = false;
+                        //如果需要的话获取焦点
                         if (isFocusable() && isFocusableInTouchMode() && !isFocused()) {
                             focusTaken = requestFocus();
                         }
 
                         if (prepressed) {
+                            //在可滑动控件中，按下是延迟触发，如果 Down 和 Up 时间相差时间下没触发，这里触发下
                             // The button is being released before we actually
                             // showed it as pressed.  Make it show the pressed
                             // state now (before scheduling the click) to ensure
@@ -15345,9 +15355,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         }
 
                         if (!mHasPerformedLongPress && !mIgnoreNextUpEvent) {
+                            // 长按事件没触发，代表是点击事件。则触发点击事件，将之前设置的延迟触发长按Runnable取消
                             // This is a tap, so remove the longpress check
                             removeLongPressCallback();
 
+                            //可获取焦点的View,只有在获取焦点后在点击才可触发点击事件
                             // Only perform take click actions if we were in the pressed state
                             if (!focusTaken) {
                                 // Use a Runnable and post this rather than calling
@@ -15357,6 +15369,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                                     mPerformClick = new PerformClick();
                                 }
                                 if (!post(mPerformClick)) {
+                                    //触发点击事件
                                     performClickInternal();
                                 }
                             }
@@ -15367,6 +15380,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         }
 
                         if (prepressed) {
+                            //View 在可滑动控件中，setPressed(true) 可能是上面触发的，需要延迟设置 setPressed(false) 两个状态才有都有效果
                             postDelayed(mUnsetPressedState,
                                     ViewConfiguration.getPressedStateDuration());
                         } else if (!post(mUnsetPressedState)) {
@@ -15381,6 +15395,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 
                 case MotionEvent.ACTION_DOWN:
                     if (event.getSource() == InputDevice.SOURCE_TOUCHSCREEN) {
+                        //判断触摸事件是否由屏幕，还可能是键盘等
                         mPrivateFlags3 |= PFLAG3_FINGER_DOWN;
                     }
                     mHasPerformedLongPress = false;
@@ -15398,6 +15413,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         break;
                     }
 
+                    //判断是否在可滑动的控件中
                     // Walk up the hierarchy to determine if we're inside a scrolling container.
                     boolean isInScrollingContainer = isInScrollingContainer();
 
@@ -15410,8 +15426,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         }
                         mPendingCheckForTap.x = event.getX();
                         mPendingCheckForTap.y = event.getY();
+                        //View 在滑动的控件中,按下可能是要触发滑动，所以当前的 View 的按下等表现需要延迟判断
                         postDelayed(mPendingCheckForTap, ViewConfiguration.getTapTimeout());
                     } else {
+                        //不在滑动控件中，直接触发按下表现，长按事件的触发逻辑是在 Down 事件添加的延迟执行的 Message，再在 Up 和 Cancel 取消
                         // Not inside a scrolling container, so show the feedback right away
                         setPressed(true, x, y);
                         checkForLongClick(
@@ -15436,13 +15454,16 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 
                 case MotionEvent.ACTION_MOVE:
                     if (clickable) {
+                        //水波纹效果
                         drawableHotspotChanged(x, y);
                     }
 
                     final int motionClassification = event.getClassification();
                     final boolean ambiguousGesture =
                             motionClassification == MotionEvent.CLASSIFICATION_AMBIGUOUS_GESTURE;
+                    //因为手指的滑动不是很精确的，可能滑动到控件边缘，这个属性就是小于这个值就不算滑出去
                     int touchSlop = mTouchSlop;
+                    //下面可能是 android 10后全局手势的处理
                     if (ambiguousGesture && hasPendingLongPressCallback()) {
                         final float ambiguousMultiplier =
                                 ViewConfiguration.getAmbiguousGestureMultiplier();
@@ -15464,6 +15485,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         touchSlop *= ambiguousMultiplier;
                     }
 
+                    //如果滑出控件外，那么认为事件不是该 View 的
                     // Be lenient about moving outside of buttons
                     if (!pointInView(x, y, touchSlop)) {
                         // Outside button
@@ -15476,6 +15498,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
                     }
 
+                    //将触摸事件分为轻触和重触，重触就直接触发长按事件
                     final boolean deepPress =
                             motionClassification == MotionEvent.CLASSIFICATION_DEEP_PRESS;
                     if (deepPress && hasPendingLongPressCallback()) {

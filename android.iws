@@ -38,15 +38,24 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
     <property name="android-custom-viewD:/source/android10-main/frameworks/base/core/java/android/view/View.java_SELECTED" value="View" />
     <property name="android-custom-viewD:/source/android10-main/frameworks/base/core/java/android/view/ViewGroup.java_SELECTED" value="ViewGroup" />
     <property name="android-custom-viewD:/source/android10-main/frameworks/base/core/java/android/widget/TextView.java_SELECTED" value="TextView" />
+    <property name="android-custom-viewD:/source/android10-main/frameworks/base/core/java/com/android/internal/widget/RecyclerView.java_SELECTED" value="RecyclerView" />
+    <property name="cidr.known.project.marker" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/android.ipr" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Users/AndroidStudioProjects/ShellProject/ShellProject" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="show.migrate.to.gradle.popup" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\source\android10-main\frameworks\base\core\java\java\util\concurrent" />
+      <recent name="D:\source\android10-main" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">

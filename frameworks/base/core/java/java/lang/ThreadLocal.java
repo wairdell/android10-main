@@ -485,18 +485,21 @@ public class ThreadLocal<T> {
                 ThreadLocal<?> k = e.get();
 
                 if (k == key) {
+                    //之前已设置过，在map中有自己的位置
                     e.value = value;
                     return;
                 }
 
                 if (k == null) {
+                    //有失效的位置
                     replaceStaleEntry(key, value, i);
                     return;
                 }
             }
-
+            //没有发现之前设置过而且没有失效的位置，就插入到连续空间的最后面
             tab[i] = new Entry(key, value);
             int sz = ++size;
+            //进行空间整理，以及扩容
             if (!cleanSomeSlots(i, sz) && sz >= threshold)
                 rehash();
         }
@@ -532,7 +535,7 @@ public class ThreadLocal<T> {
          * @param key       the key
          * @param value     the value to be associated with key
          * @param staleSlot index of the first stale entry encountered while
-         *                  searching for key.
+         *                  searching for key.搜索键时遇到的第一个过时条目的索引。
          */
         private void replaceStaleEntry(ThreadLocal<?> key, Object value,
                                        int staleSlot) {
@@ -548,6 +551,7 @@ public class ThreadLocal<T> {
             for (int i = prevIndex(staleSlot, len);
                  (e = tab[i]) != null;
                  i = prevIndex(i, len))
+                //连续空间往前找，找到最前面失效的位置
                 if (e.get() == null)
                     slotToExpunge = i;
 
@@ -563,13 +567,15 @@ public class ThreadLocal<T> {
                 // The newly stale slot, or any other stale slot
                 // encountered above it, can then be sent to expungeStaleEntry
                 // to remove or rehash all of the other entries in run.
+                //一直往后找，找到了之前设置过的，已存在的位置
                 if (k == key) {
                     e.value = value;
-
+                    //把自己已存在的位置和过时的位置进行交换(因为过时的位置最接近目标位置)
                     tab[i] = tab[staleSlot];
                     tab[staleSlot] = e;
 
                     // Start expunge at preceding stale entry if it exists
+                    //没有搜索到其他失效的元素，则已当前的位置进行清理
                     if (slotToExpunge == staleSlot)
                         slotToExpunge = i;
                     cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);
@@ -579,14 +585,16 @@ public class ThreadLocal<T> {
                 // If we didn't find stale entry on backward scan, the
                 // first stale entry seen while scanning for key is the
                 // first still present in the run.
+                //向后循环时发现一个失效位置，并且之前的位置都没有失效，直接设置成第一个发现的。
                 if (k == null && slotToExpunge == staleSlot)
                     slotToExpunge = i;
             }
 
             // If key not found, put new entry in stale slot
+            //没有发现之前插入过，则直接使用最近的那个失效元素的位置
             tab[staleSlot].value = null;
             tab[staleSlot] = new Entry(key, value);
-
+            //发现其他失效了位置，进行清理
             // If there are any other stale entries in run, expunge them
             if (slotToExpunge != staleSlot)
                 cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);
@@ -620,18 +628,22 @@ public class ThreadLocal<T> {
                  i = nextIndex(i, len)) {
                 ThreadLocal<?> k = e.get();
                 if (k == null) {
+                    //已经失效的ThreadLocal把位置空出来
                     e.value = null;
                     tab[i] = null;
                     size--;
                 } else {
+                    //没有失效的ThreadLocal判断当前存放的位置是不是目标存放的位置，不是的话则循环目标位置和其后面连续的位置，遇到空出的则放入其中
                     int h = k.threadLocalHashCode & (len - 1);
                     if (h != i) {
+                        //先把当前占有的位置空出
                         tab[i] = null;
 
                         // Unlike Knuth 6.4 Algorithm R, we must scan until
                         // null because multiple entries could have been stale.
                         while (tab[h] != null)
                             h = nextIndex(h, len);
+                        //找到了位置则放入到此处
                         tab[h] = e;
                     }
                 }
@@ -649,7 +661,7 @@ public class ThreadLocal<T> {
          * garbage but would cause some insertions to take O(n) time.
          *
          * @param i a position known NOT to hold a stale entry. The
-         *          scan starts at the element after i.
+         *          scan starts at the element after i. 不会存在过时条目的位置(之前已经整理过)
          * @param n scan control: {@code log2(n)} cells are scanned,
          *          unless a stale entry is found, in which case
          *          {@code log2(table.length)-1} additional cells are scanned.
@@ -673,6 +685,7 @@ public class ThreadLocal<T> {
                     removed = true;
                     i = expungeStaleEntry(i);
                 }
+                //不太明白为什么是log2N
             } while ((n >>>= 1) != 0);
             return removed;
         }
@@ -683,6 +696,7 @@ public class ThreadLocal<T> {
          * shrink the size of the table, double the table size.
          */
         private void rehash() {
+            //这里目的不仅仅是为了整理空间，整理空间后把无效位置后，可能就无需扩容了
             expungeStaleEntries();
 
             // Use lower threshold for doubling to avoid hysteresis
