@@ -108,6 +108,7 @@ public final class Choreographer {
         protected Choreographer initialValue() {
             Looper looper = Looper.myLooper();
             if (looper == null) {
+                //当前线程要有looper，Choreographer实例需要传入
                 throw new IllegalStateException("The current thread must have a looper!");
             }
             Choreographer choreographer = new Choreographer(looper, VSYNC_SOURCE_APP);
@@ -207,6 +208,7 @@ public final class Choreographer {
      * Callback type: Input callback.  Runs first.
      * @hide
      */
+    //输入事件，首先执行
     public static final int CALLBACK_INPUT = 0;
 
     /**
@@ -214,6 +216,7 @@ public final class Choreographer {
      * @hide
      */
     @TestApi
+    //动画，第二执行
     public static final int CALLBACK_ANIMATION = 1;
 
     /**
@@ -229,6 +232,7 @@ public final class Choreographer {
      * Runs before traversals.
      * @hide
      */
+    //插入更新的动画，第三执行
     public static final int CALLBACK_INSETS_ANIMATION = 2;
 
     /**
@@ -236,6 +240,7 @@ public final class Choreographer {
      * after all other asynchronous messages have been handled.
      * @hide
      */
+    //绘制，第四执行
     public static final int CALLBACK_TRAVERSAL = 3;
 
     /**
@@ -248,20 +253,26 @@ public final class Choreographer {
      * to the view hierarchy state) actually took effect.
      * @hide
      */
+    //提交，最后执行，
     public static final int CALLBACK_COMMIT = 4;
 
     private static final int CALLBACK_LAST = CALLBACK_COMMIT;
 
     private Choreographer(Looper looper, int vsyncSource) {
         mLooper = looper;
+        //使用当前线程looper创建 mHandler
         mHandler = new FrameHandler(looper);
+        //USE_VSYNC 4.1以上默认是true，表示 具备接受VSync的能力，这个接受能力就是FrameDisplayEventReceiver
         mDisplayEventReceiver = USE_VSYNC
                 ? new FrameDisplayEventReceiver(looper, vsyncSource)
                 : null;
         mLastFrameTimeNanos = Long.MIN_VALUE;
 
+        // 计算一帧的时间，Android手机屏幕是60Hz的刷新频率，就是16ms
         mFrameIntervalNanos = (long)(1000000000 / getRefreshRate());
 
+        // 创建一个链表类型CallbackQueue的数组，大小为5，
+        //也就是数组中有五个链表，每个链表存相同类型的任务：输入、动画、遍历绘制等任务（CALLBACK_INPUT、CALLBACK_ANIMATION、CALLBACK_TRAVERSAL）
         mCallbackQueues = new CallbackQueue[CALLBACK_LAST + 1];
         for (int i = 0; i <= CALLBACK_LAST; i++) {
             mCallbackQueues[i] = new CallbackQueue();
@@ -454,13 +465,18 @@ public final class Choreographer {
         }
 
         synchronized (mLock) {
+            // 当前时间
             final long now = SystemClock.uptimeMillis();
+            // 加上延迟时间
             final long dueTime = now + delayMillis;
+            //取对应类型的CallbackQueue添加任务
             mCallbackQueues[callbackType].addCallbackLocked(dueTime, action, token);
 
             if (dueTime <= now) {
+                //立即执行
                 scheduleFrameLocked(now);
             } else {
+                //延迟运行，最终也会走到scheduleFrameLocked()
                 Message msg = mHandler.obtainMessage(MSG_DO_SCHEDULE_CALLBACK, action);
                 msg.arg1 = callbackType;
                 msg.setAsynchronous(true);
@@ -621,6 +637,7 @@ public final class Choreographer {
     private void scheduleFrameLocked(long now) {
         if (!mFrameScheduled) {
             mFrameScheduled = true;
+            //开启了VSYNC
             if (USE_VSYNC) {
                 if (DEBUG_FRAMES) {
                     Log.d(TAG, "Scheduling next frame on vsync.");
@@ -629,14 +646,18 @@ public final class Choreographer {
                 // If running on the Looper thread, then schedule the vsync immediately,
                 // otherwise post a message to schedule the vsync from the UI thread
                 // as soon as possible.
+                //当前执行的线程，是否是mLooper所在线程
                 if (isRunningOnLooperThreadLocked()) {
+                    //申请 VSYNC 信号
                     scheduleVsyncLocked();
                 } else {
+                    // 若不在，就用mHandler发送消息到原线程，最后还是调用scheduleVsyncLocked方法
                     Message msg = mHandler.obtainMessage(MSG_DO_SCHEDULE_VSYNC);
                     msg.setAsynchronous(true);
                     mHandler.sendMessageAtFrontOfQueue(msg);
                 }
             } else {
+                // 如果未开启VSYNC则直接doFrame方法（4.1后默认开启）
                 final long nextFrameTime = Math.max(
                         mLastFrameTimeNanos / TimeUtils.NANOS_PER_MS + sFrameDelay, now);
                 if (DEBUG_FRAMES) {
@@ -669,12 +690,16 @@ public final class Choreographer {
                         + ((frameTimeNanos - mLastFrameTimeNanos) * 0.000001f) + " ms");
             }
 
+            // 预期执行时间
             long intendedFrameTimeNanos = frameTimeNanos;
             startNanos = System.nanoTime();
+            // 超时时间是否超过一帧的时间（这是因为MessageQueue虽然添加了同步屏障，但是还是有正在执行的同步任务，导致doFrame延迟执行了）
             final long jitterNanos = startNanos - frameTimeNanos;
             if (jitterNanos >= mFrameIntervalNanos) {
+                // 计算掉帧数
                 final long skippedFrames = jitterNanos / mFrameIntervalNanos;
                 if (skippedFrames >= SKIPPED_FRAME_WARNING_LIMIT) {
+                    //掉帧超过30帧打印Log提示
                     Log.i(TAG, "Skipped " + skippedFrames + " frames!  "
                             + "The application may be doing too much work on its main thread.");
                 }
@@ -707,11 +732,14 @@ public final class Choreographer {
             }
 
             mFrameInfo.setVsync(intendedFrameTimeNanos, frameTimeNanos);
+            // Frame标志位恢复
             mFrameScheduled = false;
+            // 记录最后一帧时间
             mLastFrameTimeNanos = frameTimeNanos;
         }
 
         try {
+            // 按类型顺序 执行任务
             Trace.traceBegin(Trace.TRACE_TAG_VIEW, "Choreographer#doFrame");
             AnimationUtils.lockAnimationClock(frameTimeNanos / TimeUtils.NANOS_PER_MS);
 
@@ -746,6 +774,7 @@ public final class Choreographer {
             // for earlier processing phases in a frame to post callbacks that should run
             // in a following phase, such as an input event that causes an animation to start.
             final long now = System.nanoTime();
+            // 根据指定的类型CallbackkQueue中查找到达执行时间的CallbackRecord
             callbacks = mCallbackQueues[callbackType].extractDueCallbacksLocked(
                     now / TimeUtils.NANOS_PER_MS);
             if (callbacks == null) {
@@ -761,6 +790,7 @@ public final class Choreographer {
             // or equal to the previous frame's commit frame time.  Keep in mind that the
             // next frame has most likely already been scheduled by now so we play it
             // safe by ensuring the commit time is always at least one frame behind.
+            //提交任务类型
             if (callbackType == Choreographer.CALLBACK_COMMIT) {
                 final long jitterNanos = now - frameTimeNanos;
                 Trace.traceCounter(Trace.TRACE_TAG_VIEW, "jitterNanos", (int) jitterNanos);
@@ -782,12 +812,14 @@ public final class Choreographer {
         }
         try {
             Trace.traceBegin(Trace.TRACE_TAG_VIEW, CALLBACK_TRACE_TITLES[callbackType]);
+            // 迭代执行队列所有任务
             for (CallbackRecord c = callbacks; c != null; c = c.next) {
                 if (DEBUG_FRAMES) {
                     Log.d(TAG, "RunCallback: type=" + callbackType
                             + ", action=" + c.action + ", token=" + c.token
                             + ", latencyMillis=" + (SystemClock.uptimeMillis() - c.dueTime));
                 }
+                // 回调CallbackRecord的run，其内部回调Callback的run
                 c.run(frameTimeNanos);
             }
         } finally {
@@ -795,6 +827,7 @@ public final class Choreographer {
                 mCallbacksRunning = false;
                 do {
                     final CallbackRecord next = callbacks.next;
+                    //回收CallbackRecord
                     recycleCallbackLocked(callbacks);
                     callbacks = next;
                 } while (callbacks != null);
@@ -892,12 +925,15 @@ public final class Choreographer {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_DO_FRAME:
+                    // 执行doFrame,即绘制过程
                     doFrame(System.nanoTime(), 0);
                     break;
                 case MSG_DO_SCHEDULE_VSYNC:
+                    //申请VSYNC信号，例如当前需要绘制任务时
                     doScheduleVsync();
                     break;
                 case MSG_DO_SCHEDULE_CALLBACK:
+                    //需要延迟的任务，最终还是执行上述两个事件
                     doScheduleCallback(msg.arg1);
                     break;
             }

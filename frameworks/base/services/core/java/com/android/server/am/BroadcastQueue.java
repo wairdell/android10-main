@@ -1076,6 +1076,7 @@ public final class BroadcastQueue {
                             + " numReceivers=" + numReceivers
                             + " nextReceiver=" + r.nextReceiver
                             + " state=" + r.state);
+                    //当广播处理时间超时，则强制结束这条广播
                     broadcastTimeoutLocked(false); // forcibly finish this broadcast
                     forceReceive = true;
                     r.state = BroadcastRecord.IDLE;
@@ -1128,6 +1129,7 @@ public final class BroadcastQueue {
                                 Slog.i(TAG_BROADCAST, "Finishing broadcast [" + mQueueName + "] "
                                         + r.intent.getAction() + " app=" + r.callerApp);
                             }
+                            //处理广播消息消息
                             performReceiveLocked(r.callerApp, r.resultTo,
                                     new Intent(r.intent), r.resultCode,
                                     r.resultData, r.resultExtras, false, false, r.userId);

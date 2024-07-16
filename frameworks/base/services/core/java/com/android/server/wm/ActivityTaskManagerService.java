@@ -1041,8 +1041,10 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
             Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,
             int startFlags, ProfilerInfo profilerInfo, Bundle bOptions, int userId,
             boolean validateIncomingUser) {
+        //检查调用者的进程是否隔离，如果 isIsolated 则抛出 SecurityException 异常
         enforceNotIsolatedCaller("startActivityAsUser");
 
+        // 检查调用者权限，ATMS 根据传入的 UserId 来确定调用者的权限
         userId = getActivityStartController().checkTargetUser(userId, validateIncomingUser,
                 Binder.getCallingPid(), Binder.getCallingUid(), "startActivityAsUser");
 

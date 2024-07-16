@@ -4273,7 +4273,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             r.window = r.activity.getWindow();
             View decor = r.window.getDecorView();
             decor.setVisibility(View.INVISIBLE);
-            ViewManager wm = a.getWindowManager();
+            ViewManager wm = a.getWindowVManager();
             WindowManager.LayoutParams l = r.window.getAttributes();
             a.mDecor = decor;
             l.type = WindowManager.LayoutParams.TYPE_BASE_APPLICATION;
@@ -7082,6 +7082,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                 throw ex.rethrowFromSystemServer();
             }
             // Watch for getting close to heap limit.
+            //观察内存做Activity回收
             BinderInternal.addGcWatcher(new Runnable() {
                 @Override public void run() {
                     if (!mSomeActivitiesChanged) {
@@ -7325,7 +7326,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         TrustedCertificateStore.setDefaultUserDirectory(configDir);
 
         Process.setArgV0("<pre-initialized>");
-
+        //创建主线程的Looper
         Looper.prepareMainLooper();
 
         // Find the value for {@link #PROC_START_SEQ_IDENT} if provided on the command line.
@@ -7340,6 +7341,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             }
         }
         ActivityThread thread = new ActivityThread();
+        //AMS绑定ApplicationThread对象,即应用进程绑定到AMS
         thread.attach(false, startSeq);
 
         if (sMainThreadHandler == null) {
@@ -7353,6 +7355,7 @@ public final class ActivityThread extends ClientTransactionHandler {
 
         // End of event ActivityThreadMain.
         Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+        //开启主线程的消息循环
         Looper.loop();
 
         throw new RuntimeException("Main thread loop unexpectedly exited");

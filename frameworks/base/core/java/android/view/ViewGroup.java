@@ -2762,6 +2762,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     } else {
                         final boolean cancelChild = resetCancelNextUpFlag(target.child)
                                 || intercepted;
+                        //如果Down事件有子View消费，但是其他事件被父View拦截，会分发Cacnel事件给子View
                         if (dispatchTransformedTouchEvent(ev, cancelChild,
                                 target.child, target.pointerIdBits)) {
                             handled = true;

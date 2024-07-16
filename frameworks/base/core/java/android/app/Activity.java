@@ -3316,7 +3316,7 @@ public class Activity extends ContextThemeWrapper
         }
 
         if (toolbar != null) {
-            final ToolbarActionBar tbab = new ToolbarActionBar(toolbar, getTitle(), this);
+            final ToolbarActionBar tbab = new ToolbarActionBar(toolbar, getTitle(), th  is);
             mActionBar = tbab;
             mWindow.setCallback(tbab.getWrappedWindowCallback());
         } else {

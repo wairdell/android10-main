@@ -977,9 +977,11 @@ public class ZygoteInit {
 
         Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "ZygoteInit");
         RuntimeInit.redirectLogStreams();
-
+        //为当前的VM设置未捕获异常器
         RuntimeInit.commonInit();
+        //Binder驱动初始化，该方法完成后，可通过Binder进行进程通信
         ZygoteInit.nativeZygoteInit();
+        //主要调用ActivityThread的main方法
         return RuntimeInit.applicationInit(targetSdkVersion, argv, classLoader);
     }
 

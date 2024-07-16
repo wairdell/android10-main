@@ -245,7 +245,7 @@
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="Android API 29 Platform" project-jdk-type="Android SDK">
-    <output url="file:///tmp/intellij/Volumes/UNTITLED/Android10/android-10.0.0_r41/classes" />
+    <output url="file://$USER_HOME$/.jbr/jbrsdk_jcef-17.0.6-windows-x64-b653.34/bin/tmp/intellij/Volumes/UNTITLED/Android10/android-10.0.0_r41/classes" />
   </component>
   <component name="RmicSettings">
     <option name="IS_EANABLED" value="false" />
@@ -288,131 +288,6 @@
     <mapping directory="$PROJECT_DIR$/frameworks/opt/vcard" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/frameworks/rs" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/frameworks/wilhelm" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/kernel/build" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/kernel/configs" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/kernel/tests" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/BasicSmsReceiver" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Bluetooth" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Browser2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Calendar" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Camera2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Cluster" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/CompanionDeviceSupport" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Dialer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Hvac" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/LatinIME" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Launcher" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/LensPicker" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/LinkViewer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/LocalMediaPlayer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Media" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Messenger" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Notification" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Overview" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Radio" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Settings" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/Stream" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/SystemUpdater" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/externallibs" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/libs" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Car/tests" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/CarrierConfig" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/CellBroadcastReceiver" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/CertInstaller" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Contacts" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/DeskClock" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/DevCamera" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Dialer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/DocumentsUI" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Email" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/EmergencyInfo" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Gallery" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Gallery2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/HTMLViewer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/KeyChain" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Launcher3" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/LegacyCamera" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/ManagedProvisioning" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Messaging" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Music" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/MusicFX" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Nfc" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/OneTimeInitializer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/PermissionController" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/PhoneCommon" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Protips" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Provision" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/QuickSearchBox" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/SafetyRegulatoryInfo" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/SampleLocationAttribution" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/SecureElement" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Settings" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/SettingsIntelligence" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/SoundRecorder" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/SpareParts" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Stk" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/StorageManager" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/TV" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Tag" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Terminal" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Test/connectivity" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/ThemePicker" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/TimeZoneData" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/TimeZoneUpdater" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/Traceur" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/TvSettings" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/UnifiedEmail" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/UniversalMediaPlayer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/WallpaperPicker" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/apps/WallpaperPicker2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/inputmethods/LatinIME" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/modules/CaptivePortalLogin" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/modules/ExtServices" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/modules/ModuleMetadata" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/modules/NetworkPermissionConfig" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/modules/NetworkStack" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/modules/TestModule" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/ApplicationsProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/BlockedNumberProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/BookmarkProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/CalendarProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/CallLogProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/ContactsProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/DownloadProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/MediaProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/PartnerBookmarksProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/TelephonyProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/TvProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/providers/UserDictionaryProvider" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/screensavers/Basic" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/screensavers/PhotoTable" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/services/AlternativeNetworkAccess" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/services/BuiltInPrintService" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/services/Car" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/services/Mms" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/services/Telecomm" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/services/Telephony" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/packages/wallpapers/LivePicker" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/framework" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/mlts/benchmark" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/mlts/models" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/mts" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/suite_harness" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vti/alert" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vti/dashboard" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vti/fuzz_test_serving" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vti/test_serving" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/fuzz" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/hal" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/hal-trace" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/kernel" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/nbu" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/performance" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/security" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/test/vts-testcase/vndk" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/toolchain/benchmark" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/toolchain/pgo-profiles" vcs="Git" />
   </component>
   <component name="com.intellij.jsf.UserDefinedFacesConfigs">
     <option name="USER_DEFINED_CONFIGS">

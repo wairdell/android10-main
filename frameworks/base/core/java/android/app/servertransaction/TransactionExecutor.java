@@ -99,6 +99,35 @@ public class TransactionExecutor {
         if (DEBUG_RESOLVER) Slog.d(TAG, tId(transaction) + "End resolving transaction");
     }
 
+    /** Transition to the final state if requested by the transaction. */
+    private void executeLifecycleState(ClientTransaction transaction) {
+        final ActivityLifecycleItem lifecycleItem = transaction.getLifecycleStateRequest();
+        if (lifecycleItem == null) {
+            // No lifecycle request, return early.
+            return;
+        }
+
+        final IBinder token = transaction.getActivityToken();
+        final ActivityClientRecord r = mTransactionHandler.getActivityClient(token);
+        if (DEBUG_RESOLVER) {
+            Slog.d(TAG, tId(transaction) + "Resolving lifecycle state: "
+                    + lifecycleItem + " for activity: "
+                    + getShortActivityName(token, mTransactionHandler));
+        }
+
+        if (r == null) {
+            // Ignore requests for non-existent client records for now.
+            return;
+        }
+
+        // Cycle to the state right before the final requested state.
+        cycleToPath(r, lifecycleItem.getTargetState(), true /* excludeLastState */, transaction);
+
+        // Execute the final transition with proper parameters.
+        lifecycleItem.execute(mTransactionHandler, token, mPendingActions);
+        lifecycleItem.postExecute(mTransactionHandler, token, mPendingActions);
+    }
+
     /** Cycle through all states requested by callbacks and execute them at proper times. */
     @VisibleForTesting
     public void executeCallbacks(ClientTransaction transaction) {
@@ -146,35 +175,6 @@ public class TransactionExecutor {
                 cycleToPath(r, postExecutionState, shouldExcludeLastTransition, transaction);
             }
         }
-    }
-
-    /** Transition to the final state if requested by the transaction. */
-    private void executeLifecycleState(ClientTransaction transaction) {
-        final ActivityLifecycleItem lifecycleItem = transaction.getLifecycleStateRequest();
-        if (lifecycleItem == null) {
-            // No lifecycle request, return early.
-            return;
-        }
-
-        final IBinder token = transaction.getActivityToken();
-        final ActivityClientRecord r = mTransactionHandler.getActivityClient(token);
-        if (DEBUG_RESOLVER) {
-            Slog.d(TAG, tId(transaction) + "Resolving lifecycle state: "
-                    + lifecycleItem + " for activity: "
-                    + getShortActivityName(token, mTransactionHandler));
-        }
-
-        if (r == null) {
-            // Ignore requests for non-existent client records for now.
-            return;
-        }
-
-        // Cycle to the state right before the final requested state.
-        cycleToPath(r, lifecycleItem.getTargetState(), true /* excludeLastState */, transaction);
-
-        // Execute the final transition with proper parameters.
-        lifecycleItem.execute(mTransactionHandler, token, mPendingActions);
-        lifecycleItem.postExecute(mTransactionHandler, token, mPendingActions);
     }
 
     /** Transition the client between states. */

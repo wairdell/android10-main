@@ -451,6 +451,18 @@ public class ZygoteProcess {
     private Process.ProcessStartResult attemptUsapSendArgsAndGetResult(
             ZygoteState zygoteState, String msgStr)
             throws ZygoteStartFailedEx, IOException {
+        //通过 socket 与 Zygote 进行连接通信
+        /* activityStackSupervisor.startSpecificActivityLocked ->
+            activityManagerService.startProcess ->
+            activityManagerService.startProcessLocked ->
+            processList.startProcessLocked ->
+            processList.startProcess ->
+            Process.start ->
+            zygoteProcess.start ->
+            zygoteProcess.startViaZygote ->
+            zygoteProcess.zygoteSendArgsAndGetResult(openZygoteSocketIfNeed) ->
+            zygoteProcess.attemptUsapSendArgsAndGetResult
+         */
         try (LocalSocket usapSessionSocket = zygoteState.getUsapSessionSocket()) {
             final BufferedWriter usapWriter =
                     new BufferedWriter(

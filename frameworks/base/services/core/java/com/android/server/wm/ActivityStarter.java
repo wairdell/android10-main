@@ -897,7 +897,7 @@ class ActivityStarter {
 
             aInfo = mSupervisor.resolveActivity(intent, rInfo, startFlags, null /*profilerInfo*/);
         }
-
+        //创建 ActivityRecord，保存 Activity 的所有信息
         ActivityRecord r = new ActivityRecord(mService, callerApp, callingPid, callingUid,
                 callingPackage, intent, resolvedType, aInfo, mService.getGlobalConfiguration(),
                 resultRecord, resultWho, requestCode, componentSpecified, voiceSession != null,
@@ -2004,7 +2004,9 @@ class ActivityStarter {
             }
         }
 
+        //mInTask == null 说明 Activity 要加入的栈不存在。
         if (mInTask == null) {
+            //mSourceRecord A 启动 B，这里就是 A 的栈
             if (mSourceRecord == null) {
                 // This activity is not being started from another...  in this
                 // case we -always- start a new task.
@@ -2017,10 +2019,12 @@ class ActivityStarter {
                 // The original activity who is starting us is running as a single
                 // instance...  this new activity it is starting must go on its
                 // own task.
+                //发生启动行为的 Activity 的 launchMode 是 singleInstance，只能存放一个 Activity，新启的要放大新栈中
                 mLaunchFlags |= FLAG_ACTIVITY_NEW_TASK;
             } else if (isLaunchModeOneOf(LAUNCH_SINGLE_INSTANCE, LAUNCH_SINGLE_TASK)) {
                 // The activity being started is a single instance...  it always
                 // gets launched into its own task.
+                //需要启动的 Activity 的 launchMode 是 singleTask 或者 singleInstance，需要放入到新栈
                 mLaunchFlags |= FLAG_ACTIVITY_NEW_TASK;
             }
         }

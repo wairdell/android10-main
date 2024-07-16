@@ -166,7 +166,9 @@ public final class GrowingArrayUtils {
     /**
      * Primitive long version of {@link #insert(Object[], int, int, Object)}.
      */
-    public static long[] insert(long[] array, int currentSize, int index, long element) {
+    public static long[] insert(long[] array, int currentSize, i
+
+            nt index, long element) {
         assert currentSize <= array.length;
 
         if (currentSize + 1 <= array.length) {

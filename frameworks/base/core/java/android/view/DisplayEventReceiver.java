@@ -108,6 +108,7 @@ public abstract class DisplayEventReceiver {
         }
 
         mMessageQueue = looper.getQueue();
+        // 注册VSYNC信号监听者
         mReceiverPtr = nativeInit(new WeakReference<DisplayEventReceiver>(this), mMessageQueue,
                 vsyncSource, configChanged);
 
@@ -146,6 +147,7 @@ public abstract class DisplayEventReceiver {
     }
 
     /**
+     * 接收到VSync脉冲时 回调
      * Called when a vertical sync pulse is received.
      * The recipient should render a frame and then call {@link #scheduleVsync}
      * to schedule the next vertical sync pulse.
@@ -192,6 +194,7 @@ public abstract class DisplayEventReceiver {
             Log.w(TAG, "Attempted to schedule a vertical sync pulse but the display event "
                     + "receiver has already been disposed.");
         } else {
+            // 申请VSYNC中断信号，会回调onVsync方法// 申请VSYNC中断信号，会回调onVsync方法
             nativeScheduleVsync(mReceiverPtr);
         }
     }

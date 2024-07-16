@@ -1712,8 +1712,11 @@ public final class ViewRootImpl implements ViewParent,
     @UnsupportedAppUsage
     void scheduleTraversals() {
         if (!mTraversalScheduled) {
+            //此字段保证同时间多次更改只会刷新一次，例如TextView连续两次setText(),也只会走一次绘制流程
             mTraversalScheduled = true;
+            //添加同步屏障，屏蔽同步消息，保证VSync到来立即执行绘制
             mTraversalBarrier = mHandler.getLooper().getQueue().postSyncBarrier();
+            //mTraversalRunnable是TraversalRunnable实例，最终走到run()，也即doTraversal();
             mChoreographer.postCallback(
                     Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null);
             if (!mUnbufferedInputDispatch) {
@@ -1736,12 +1739,13 @@ public final class ViewRootImpl implements ViewParent,
     void doTraversal() {
         if (mTraversalScheduled) {
             mTraversalScheduled = false;
+            //移除同步屏障
             mHandler.getLooper().getQueue().removeSyncBarrier(mTraversalBarrier);
 
             if (mProfile) {
                 Debug.startMethodTracing("ViewAncestor");
             }
-
+            //开始三大绘制流程
             performTraversals();
 
             if (mProfile) {

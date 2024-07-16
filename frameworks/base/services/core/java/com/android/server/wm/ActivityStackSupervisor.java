@@ -974,8 +974,10 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
                 mService.getProcessController(r.processName, r.info.applicationInfo.uid);
 
         boolean knownToBeDead = false;
+        // wpc.hasThread() 内部通过判断 IApplicationThread 是否被赋值，如果已赋值，即应用进程已运行
         if (wpc != null && wpc.hasThread()) {
             try {
+                // 启动 Activity 的应用程序进程已经创建运行则走 Activity 的生命周期，即普通 Activity 的启动走 realStartActivityLocked() 方法继续 Activity 的创建
                 realStartActivityLocked(r, wpc, andResume, checkConfig);
                 return;
             } catch (RemoteException e) {
@@ -1002,6 +1004,7 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
             }
             // Post message to start process to avoid possible deadlock of calling into AMS with the
             // ATMS lock held.
+            // 如果未赋值，即应用进程还不存在，则需要创建应用进程，由于是根 Activity 的启动所以应用进程还未被创建并启动
             final Message msg = PooledLambda.obtainMessage(
                     ActivityManagerInternal::startProcess, mService.mAmInternal, r.processName,
                     r.info.applicationInfo, knownToBeDead, "activity", r.intent.getComponent());
